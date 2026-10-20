@@ -31,7 +31,8 @@ public class Leg : MonoBehaviour
         }
         else
         {
-            motor.motorSpeed = returnSpeed * -direction;
+            motor.motorSpeed = Mathf.Clamp(
+                -joint.jointAngle * 10f, -returnSpeed, returnSpeed);
         }
         motor.maxMotorTorque = 200f;
         joint.useMotor = true;
