@@ -4,20 +4,36 @@ public class Player : MonoBehaviour
 {
     public Leg leg;
     private Rigidbody2D rb;
-    public Transform groundCheck;
+    private Collider2D bodyCollider;
     public LayerMask groundLayer;
     public float jumpSpeed = 10f;
+    public bool IsGrounded => rb != null && bodyCollider != null
+        && rb.linearVelocity.y <= 0.1f
+        && bodyCollider.IsTouchingLayers(groundLayer);
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        bodyCollider = GetComponent<Collider2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded)
+        {
+            leg.CancelKick();
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
+        }
+
+        if (!IsGrounded)
+        {
+            leg.CancelKick();
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             leg.Kick(-1);
@@ -26,11 +42,5 @@ public class Player : MonoBehaviour
         {
             leg.Kick(1);
         }
-        bool isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.linearVelocity = Vector2.up * jumpSpeed;
-        }
-
     }
 }
